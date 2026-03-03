@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Básico -->
+    <title>PDF Quick-Tool: Unir, Dividir y Extraer Texto Gratis Online</title>
+    <meta name="description"
+        content="Herramienta gratuita para unir PDF, extraer texto y eliminar páginas localmente. Privacidad total: tus archivos nunca salen de tu navegador.">
+    <meta name="keywords"
+        content="unir pdf gratis online, extraer texto de pdf sin registro, eliminar paginas pdf, pdf quick-tool">
+
+    <!-- OpenGraph (Redes Sociales) -->
+    <meta property="og:title" content="PDF Quick-Tool: Procesa tus PDF al instante">
+    <meta property="og:description"
+        content="Une, divide y extrae texto de tus PDFs sin subir archivos a ningún servidor. Privacidad 100% garantizada.">
+    <meta property="og:type" content="website">
+
+    <!-- Scripts & Estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        .drop-zone--over {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100">
+
+    <!-- AD_SPACE: Header -->
+    <div id="ad-header"
+        class="w-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-xs text-gray-500 min-h-[90px]">
+        AD_SPACE - Header Banner (Esperando consentimiento)
+    </div>
+
+    <!-- Navegación y Título -->
+    <header class="container mx-auto px-4 py-8 text-center relative">
+        <div class="absolute top-0 right-4 mt-4">
+            <select id="lang-select" onchange="changeLanguage(this.value)"
+                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-sm outline-none">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+                <option value="pt">Português</option>
+                <option value="de">Deutsch</option>
+                <option value="fr">Français</option>
+            </select>
+        </div>
+        <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl mb-4" data-i18n="title_main">
+            PDF Quick-Tool
+        </h1>
+        <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" data-i18n="subtitle_main">
+            La herramienta definitiva para <strong>unir PDF gratis online</strong> y <strong>extraer texto de PDF sin
+                registro</strong>. 100% privado y seguro.
+        </p>
+    </header>
+
+    <main class="container mx-auto px-4 py-6 max-w-5xl">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+            <!-- Columna Principal -->
+            <div class="lg:col-span-3 space-y-6">
+
+                <!-- Tabs -->
+                <nav class="flex justify-around border-b border-gray-200 dark:border-gray-700 mb-8">
+                    <button onclick="switchTab('merge')" id="tab-merge" class="tab-btn pb-4 font-semibold tab-active"
+                        data-i18n="tab_merge">Unir PDFs</button>
+                    <button onclick="switchTab('extract')" id="tab-extract" class="tab-btn pb-4 font-semibold"
+                        data-i18n="tab_extract">Extraer
+                        Texto</button>
+                    <button onclick="switchTab('remove')" id="tab-remove" class="tab-btn pb-4 font-semibold"
+                        data-i18n="tab_remove">Eliminar
+                        Páginas</button>
+                </nav>
+
+                <!-- Herramienta Interactiva -->
+                <section
+                    class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+                    <div id="drop-zone"
+                        class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-12 text-center transition-all cursor-pointer hover:border-blue-400">
+                        <i class="fas fa-file-pdf text-5xl text-blue-500 mb-4"></i>
+                        <p class="text-lg font-medium" data-i18n="drop_zone_title">Arrastra tus archivos aquí o haz clic
+                            para subir</p>
+                        <p class="text-sm text-gray-500 mt-2" data-i18n="drop_zone_subtitle">Solo archivos .pdf
+                            admitidos</p>
+                        <input type="file" id="file-input" class="hidden" multiple accept=".pdf">
+                    </div>
+
+                    <!-- Lista de archivos seleccionados -->
+                    <div id="file-list" class="mt-6 space-y-2"></div>
+
+                    <!-- Configuración según herramienta -->
+                    <div id="config-area" class="mt-8 hidden">
+                        <div id="remove-pages-config" class="hidden">
+                            <label class="block text-sm font-medium mb-2" data-i18n="pages_to_remove">Páginas a eliminar
+                                (ej: 1, 3-5):</label>
+                            <input type="text" id="pages-to-remove" placeholder="1, 4, 5"
+                                class="w-full p-3 rounded-lg border dark:bg-gray-700 dark:border-gray-600">
+                        </div>
+
+                        <button id="process-btn"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center space-x-2 mt-4">
+                            <span id="btn-text" data-i18n="process_btn">Procesar Archivo</span>
+                            <div id="loader"
+                                class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin">
+                            </div>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- AD_SPACE: Post-Action -->
+                <div id="ad-post-action"
+                    class="w-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center rounded-lg text-xs text-gray-500 min-h-[90px] mt-8">
+                    AD_SPACE - Below Action Button (Esperando consentimiento)
+                </div>
+
+                <!-- Sección SEO de Contenido -->
+                <article class="prose dark:prose-invert max-w-none mt-12">
+                    <h2 class="text-2xl font-bold" data-i18n="seo_h2">¿Cómo unir PDF gratis online con esta herramienta?
+                    </h2>
+                    <p data-i18n="seo_p">Nuestra herramienta utiliza la tecnología de <strong>procesamiento en el
+                            cliente</strong>. A
+                        diferencia de otros sitios, nosotros no subimos tus documentos a un servidor externo. Todo
+                        ocurre en la memoria de tu navegador, lo que la convierte en la opción más rápida y segura para
+                        manejar documentos sensibles.</p>
+
+                    <h3 class="text-xl font-semibold mt-4" data-i18n="seo_h3">Beneficios de extraer texto de PDF sin
+                        registro</h3>
+                    <ul class="list-disc pl-6">
+                        <li data-i18n="seo_li1"><strong>Privacidad:</strong> Los datos bancarios o personales no salen
+                            de tu PC.</li>
+                        <li data-i18n="seo_li2"><strong>Velocidad:</strong> Sin colas de espera ni tiempos de subida.
+                        </li>
+                        <li data-i18n="seo_li3"><strong>Sin límites:</strong> Procesa archivos grandes sin restricciones
+                            de cuenta premium.
+                        </li>
+                    </ul>
+                </article>
+
+                <!-- FAQ Section -->
+                <section class="mt-12 space-y-4">
+                    <h2 class="text-2xl font-bold mb-6" data-i18n="faq_title">Preguntas Frecuentes (FAQ)</h2>
+                    <div class="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                        <h3 class="font-bold" data-i18n="faq_q1">¿Es seguro subir mis documentos?</h3>
+                        <p class="text-sm" data-i18n="faq_a1">Absolutamente. PDF Quick-Tool procesa los archivos
+                            localmente. Tus PDFs nunca
+                            se envían a la nube.</p>
+                    </div>
+                    <div class="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                        <h3 class="font-bold" data-i18n="faq_q2">¿Tiene algún costo o límite de uso?</h3>
+                        <p class="text-sm" data-i18n="faq_a2">No. Es totalmente gratuito y no requiere registro previo
+                            para funcionar.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sidebar / AD_SPACE -->
+            <aside class="lg:col-span-1 space-y-6">
+                <div id="ad-sidebar"
+                    class="sticky top-6 bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-xs text-gray-500 rounded-lg min-h-[600px] w-full">
+                    AD_SPACE - Sidebar Desktop (Esperando consentimiento)
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="bg-gray-100 dark:bg-gray-950 py-12 mt-20 border-t dark:border-gray-800 pb-32">
+        <!-- pb-32 para el banner de cookies -->
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <!-- Columna 1: Seguridad y Confianza -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">PDF Quick-Tool</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2" data-i18n="footer_trust">
+                        <i class="fas fa-shield-alt text-green-500 mr-2"></i> Procesamiento 100% local. Tus archivos
+                        nunca salen de tu navegador.
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-500" data-i18n="footer_copy">
+                        &copy; 2024 PDF Quick-Tool. Herramienta de código abierto.
+                    </p>
+                </div>
+
+                <!-- Columna 2: Legal -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100" data-i18n="footer_legal_title">
+                        Legal</h4>
+                    <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a href="privacy.html" class="hover:text-blue-500 transition-colors"
+                                data-i18n="footer_privacy">Política de Privacidad</a></li>
+                        <li><a href="terms.html" class="hover:text-blue-500 transition-colors"
+                                data-i18n="footer_terms">Términos de Servicio</a></li>
+                        <li><a href="#" onclick="resetConsent(event)" class="hover:text-blue-500 transition-colors"
+                                data-i18n="footer_cookie_settings">Configuración de Cookies</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Apoyo y Contacto -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100"
+                        data-i18n="footer_support_title">Apoya el Proyecto</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4" data-i18n="footer_support_text">
+                        Mantenemos esta herramienta gratuita gracias a la comunidad.
+                    </p>
+                    <a href="#"
+                        class="inline-flex items-center justify-center px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold rounded-lg transition-colors text-sm">
+                        <i class="fas fa-coffee mr-2"></i> Buy me a coffee
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Banner de Consentimiento de Cookies (GDPR Opt-in) -->
+    <div id="cookie-banner"
+        class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-4 transform translate-y-full transition-transform duration-500 z-50">
+        <div class="container mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-sm text-gray-700 dark:text-gray-300 flex-1">
+                <i class="fas fa-cookie-bite text-yellow-500 mr-2 text-lg"></i>
+                <span data-i18n="cookie_message">Esta herramienta es gratuita y privada (procesamiento local). Usamos
+                    cookies para mostrar anuncios que financian el proyecto. ¿Nos apoyas aceptando?</span>
+                <a href="privacy.html" class="text-blue-600 dark:text-blue-400 hover:underline ml-1"
+                    data-i18n="cookie_privacy_link">Conoce más</a>
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+                <button onclick="declineCookies()"
+                    class="flex-1 md:flex-none px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                    data-i18n="cookie_decline">Rechazar</button>
+                <button onclick="acceptCookies()"
+                    class="flex-1 md:flex-none px-6 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md rounded-lg transition-colors"
+                    data-i18n="cookie_accept">Aceptar y Usar Gratis</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            es: {
+                title_main: "PDF Quick-Tool",
+                subtitle_main: "La herramienta definitiva para <strong>unir PDF gratis online</strong> y <strong>extraer texto de PDF sin registro</strong>. 100% privado y seguro.",
+                tab_merge: "Unir PDFs",
+                tab_extract: "Extraer Texto",
+                tab_remove: "Eliminar Páginas",
+                drop_zone_title: "Arrastra tus archivos aquí o haz clic para subir",
+                drop_zone_subtitle: "Solo archivos .pdf admitidos",
+                pages_to_remove: "Páginas a eliminar (ej: 1, 3-5):",
+                process_btn: "Procesar Archivo",
+                processing_btn: "Procesando...",
+                seo_h2: "¿Cómo unir PDF gratis online con esta herramienta?",
+                seo_p: "Nuestra herramienta utiliza la tecnología de <strong>procesamiento en el cliente</strong>. A diferencia de otros sitios, nosotros no subimos tus documentos a un servidor externo. Todo ocurre en la memoria de tu navegador, lo que la convierte en la opción más rápida y segura para manejar documentos sensibles.",
+                seo_h3: "Beneficios de extraer texto de PDF sin registro",
+                seo_li1: "<strong>Privacidad:</strong> Los datos bancarios o personales no salen de tu PC.",
+                seo_li2: "<strong>Velocidad:</strong> Sin colas de espera ni tiempos de subida.",
+                seo_li3: "<strong>Sin límites:</strong> Procesa archivos grandes sin restricciones de cuenta premium.",
+                faq_title: "Preguntas Frecuentes (FAQ)",
+                faq_q1: "¿Es seguro subir mis documentos?",
+                faq_a1: "Absolutamente. PDF Quick-Tool procesa los archivos localmente. Tus PDFs nunca se envían a la nube.",
+                faq_q2: "¿Tiene algún costo o límite de uso?",
+                faq_a2: "No. Es totalmente gratuito y no requiere registro previo para funcionar.",
+                footer_copy: "&copy; 2024 PDF Quick-Tool. Herramienta de código abierto para procesamiento local.",
+                alert_pdf_loading: "La librería PDF aún se está cargando. Reintenta en un momento.",
+                alert_pdfjs_loading: "La librería PDF.js aún se está cargando. Reintenta en un momento.",
+                alert_error: "Error al procesar: ",
+                file_merged: "unido.pdf",
+                file_extracted: "texto_extraido_",
+                file_modified: "modificado.pdf",
+                page_text: "Página",
+                page_title: "PDF Quick-Tool: Unir, Dividir y Extraer Texto Gratis Online",
+                meta_description: "Herramienta gratuita para unir PDF, extraer texto y eliminar páginas localmente. Privacidad total: tus archivos nunca salen de tu navegador.",
+                meta_keywords: "unir pdf gratis online, extraer texto de pdf sin registro, eliminar paginas pdf, pdf quick-tool",
+                footer_trust: "<i class=\"fas fa-shield-alt text-green-500 mr-2\"></i> Procesamiento 100% local. Tus archivos nunca salen de tu navegador.",
+                footer_legal_title: "Legal",
+                footer_privacy: "Política de Privacidad",
+                footer_terms: "Términos de Servicio",
+                footer_support_title: "Apoya el Proyecto",
+                footer_support_text: "Mantenemos esta herramienta gratuita gracias a la comunidad.",
+                cookie_message: "Esta herramienta es gratuita y privada (procesamiento local). Usamos cookies para mostrar anuncios que financian el proyecto. ¿Nos apoyas aceptando?",
+                cookie_privacy_link: "Conoce más",
+                cookie_accept: "Aceptar y Usar Gratis",
+                cookie_decline: "Rechazar",
+                footer_cookie_settings: "Configuración de Cookies"
+            },
+            en: {
+                title_main: "PDF Quick-Tool",
+                subtitle_main: "The ultimate tool to <strong>merge PDFs online for free</strong> and <strong>extract text from PDFs without registration</strong>. 100% private and secure.",
+                tab_merge: "Merge PDFs",
+                tab_extract: "Extract Text",
+                tab_remove: "Remove Pages",
+                drop_zone_title: "Drag your files here or click to upload",
+                drop_zone_subtitle: "Only .pdf files are supported",
+                pages_to_remove: "Pages to remove (e.g., 1, 3-5):",
+                process_btn: "Process File",
+                processing_btn: "Processing...",
+                seo_h2: "How to merge PDFs online for free with this tool?",
+                seo_p: "Our tool uses <strong>client-side processing</strong> technology. Unlike other sites, we do not upload your documents to an external server. Everything happens in your browser's memory, making it the fastest and most secure option for handling sensitive documents.",
+                seo_h3: "Benefits of extracting text from PDFs without registration",
+                seo_li1: "<strong>Privacy:</strong> Bank or personal data does not leave your PC.",
+                seo_li2: "<strong>Speed:</strong> No waiting queues or upload times.",
+                seo_li3: "<strong>No limits:</strong> Process large files without premium account restrictions.",
+                faq_title: "Frequently Asked Questions (FAQ)",
+                faq_q1: "Is it safe to upload my documents?",
+                faq_a1: "Absolutely. PDF Quick-Tool processes files locally. Your PDFs are never sent to the cloud.",
+                faq_q2: "Is there any cost or usage limit?",
+                faq_a2: "No. It is completely free and requires no prior registration to work.",
+                footer_copy: "&copy; 2024 PDF Quick-Tool. Open source tool for local processing.",
+                alert_pdf_loading: "The PDF library is still loading. Try again in a moment.",
+                alert_pdfjs_loading: "The PDF.js library is still loading. Try again in a moment.",
+                alert_error: "Processing error: ",
+                file_merged: "merged.pdf",
+                file_extracted: "extracted_text_",
+                file_modified: "modified.pdf",
+                page_text: "Page",
+                page_title: "PDF Quick-Tool: Merge, Split & Extract Text Free Online",
+                meta_description: "Free tool to merge PDFs, extract text, and remove pages locally. Total privacy: your files never leave your browser.",
+                meta_keywords: "merge pdf free online, extract text from pdf without registration, remove pdf pages, pdf quick-tool",
+                footer_trust: "<i class=\"fas fa-shield-alt text-green-500 mr-2\"></i> 100% local processing. Your files never leave your browser.",
+                footer_legal_title: "Legal",
+                footer_privacy: "Privacy Policy",
+                footer_terms: "Terms of Service",
+                footer_support_title: "Support the Project",
+                footer_support_text: "We keep this tool free thanks to the community.",
+                cookie_message: "This tool is free and private (local processing). We use cookies to show ads that fund the project. Will you support us by accepting?",
+                cookie_privacy_link: "Learn more",
+                cookie_accept: "Accept and Use for Free",
+                cookie_decline: "Decline",
+                footer_cookie_settings: "Cookie Settings"
+            },
+            pt: {
+                title_main: "PDF Quick-Tool",
+                subtitle_main: "A ferramenta definitiva para <strong>unir PDF grátis online</strong> e <strong>extrair texto de PDF sem registro</strong>. 100% privado e seguro.",
+                tab_merge: "Unir PDFs",
+                tab_extract: "Extrair Texto",
+                tab_remove: "Remover Páginas",
+                drop_zone_title: "Arraste seus arquivos aqui ou clique para fazer upload",
+                drop_zone_subtitle: "Apenas arquivos .pdf são suportados",
+                pages_to_remove: "Páginas a remover (ex: 1, 3-5):",
+                process_btn: "Processar Arquivo",
+                processing_btn: "Processando...",
+                seo_h2: "Como unir PDF grátis online com esta ferramenta?",
+                seo_p: "Nossa ferramenta utiliza a tecnologia de <strong>processamento no cliente</strong>. Diferente de outros sites, não enviamos seus documentos para um servidor externo. Tudo acontece na memória do seu navegador, tornando-a a opção mais rápida e segura para lidar com documentos sensíveis.",
+                seo_h3: "Benefícios de extrair texto de PDF sem registro",
+                seo_li1: "<strong>Privacidade:</strong> Dados bancários ou pessoais não saem do seu PC.",
+                seo_li2: "<strong>Velocidade:</strong> Sem filas de espera ou tempo de upload.",
+                seo_li3: "<strong>Sem limites:</strong> Processe arquivos grandes sem restrições de contas premium.",
+                faq_title: "Perguntas Frequentes (FAQ)",
+                faq_q1: "É seguro enviar meus documentos?",
+                faq_a1: "Absolutamente. O PDF Quick-Tool processa os arquivos localmente. Seus PDFs nunca são enviados para a nuvem.",
+                faq_q2: "Existe algum custo ou limite de uso?",
+                faq_a2: "Não. É totalmente gratuito e não requer registro prévio para funcionar.",
+                footer_copy: "&copy; 2024 PDF Quick-Tool. Ferramenta de código aberto para processamento local.",
+                alert_pdf_loading: "A biblioteca PDF ainda está carregando. Tente novamente em um momento.",
+                alert_pdfjs_loading: "A biblioteca PDF.js ainda está carregando. Tente novamente em um momento.",
+                alert_error: "Erro de processamento: ",
+                file_merged: "unido.pdf",
+                file_extracted: "texto_extraido_",
+                file_modified: "modificado.pdf",
+                page_text: "Página",
+                page_title: "PDF Quick-Tool: Unir, Dividir e Extrair Texto Grátis Online",
+                meta_description: "Ferramenta gratuita para unir PDF, extrair texto e remover páginas localmente. Privacidade total: seus arquivos nunca saem do seu navegador.",
+                meta_keywords: "unir pdf grátis online, extrair texto de pdf sem registro, remover páginas pdf, pdf quick-tool",
+                footer_trust: "<i class=\"fas fa-shield-alt text-green-500 mr-2\"></i> Processamento 100% local. Seus arquivos nunca saem do seu navegador.",
+                footer_legal_title: "Legal",
+                footer_privacy: "Política de Privacidade",
+                footer_terms: "Termos de Serviço",
+                footer_support_title: "Apoie o Projeto",
+                footer_support_text: "Mantemos esta ferramenta gratuita graças à comunidade.",
+                cookie_message: "Esta ferramenta é gratuita e privada (processamento local). Usamos cookies para mostrar anúncios que financiam o projeto. Você nos apoia aceitando?",
+                cookie_privacy_link: "Saiba mais",
+                cookie_accept: "Aceitar e Usar Grátis",
+                cookie_decline: "Recusar",
+                footer_cookie_settings: "Configurações de Cookies"
+            },
+            de: {
+                title_main: "PDF Quick-Tool",
+                subtitle_main: "Das ultimative Werkzeug, um <strong>PDFs kostenlos online zusammenzuführen</strong> und <strong>Text aus PDFs ohne Registrierung zu extrahieren</strong>. 100% privat und sicher.",
+                tab_merge: "PDFs zusammenführen",
+                tab_extract: "Text extrahieren",
+                tab_remove: "Seiten entfernen",
+                drop_zone_title: "Ziehen Sie Ihre Dateien hierher oder klicken Sie zum Hochladen",
+                drop_zone_subtitle: "Nur .pdf Dateien werden unterstützt",
+                pages_to_remove: "Zu entfernende Seiten (z.B. 1, 3-5):",
+                process_btn: "Datei verarbeiten",
+                processing_btn: "Verarbeitung...",
+                seo_h2: "Wie fügt man PDFs kostenlos online mit diesem Tool zusammen?",
+                seo_p: "Unser Tool nutzt die <strong>Client-seitige Verarbeitungstechnologie</strong>. Im Gegensatz zu anderen Websites laden wir Ihre Dokumente nicht auf einen externen Server hoch. Alles passiert im Speicher Ihres Browsers, was es zur schnellsten und sichersten Option für sensible Dokumente macht.",
+                seo_h3: "Vorteile der Textextraktion aus PDFs ohne Registrierung",
+                seo_li1: "<strong>Privatsphäre:</strong> Bank- oder persönliche Daten verlassen Ihren PC nicht.",
+                seo_li2: "<strong>Geschwindigkeit:</strong> Keine Warteschlangen oder Upload-Zeiten.",
+                seo_li3: "<strong>Keine Limits:</strong> Verarbeiten Sie große Dateien ohne Premium-Account-Einschränkungen.",
+                faq_title: "Häufig gestellte Fragen (FAQ)",
+                faq_q1: "Ist es sicher, meine Dokumente hochzuladen?",
+                faq_a1: "Absolut. PDF Quick-Tool verarbeitet Dateien lokal. Ihre PDFs werden niemals in die Cloud gesendet.",
+                faq_q2: "Gibt es Kosten oder Nutzungslimits?",
+                faq_a2: "Nein. Es ist völlig kostenlos und erfordert keine vorherige Registrierung.",
+                footer_copy: "&copy; 2024 PDF Quick-Tool. Open-Source-Tool für lokale Verarbeitung.",
+                alert_pdf_loading: "Die PDF-Bibliothek wird noch geladen. Bitte versuchen Sie es gleich noch einmal.",
+                alert_pdfjs_loading: "Die PDF.js-Bibliothek wird noch geladen. Bitte versuchen Sie es gleich noch einmal.",
+                alert_error: "Verarbeitungsfehler: ",
+                file_merged: "zusammengefuehrt.pdf",
+                file_extracted: "extrahierter_text_",
+                file_modified: "geaendert.pdf",
+                page_text: "Seite",
+                page_title: "PDF Quick-Tool: PDFs gratis online zusammenführen, teilen & Text extrahieren",
+                meta_description: "Kostenloses Tool zum Zusammenführen von PDFs, Extrahieren von Text und Entfernen von Seiten lokal. Volle Privatsphäre: Ihre Dateien verlassen nie Ihren Browser.",
+                meta_keywords: "pdf kostenlos online zusammenführen, text aus pdf ohne registrierung extrahieren, pdf seiten entfernen, pdf quick-tool",
+                footer_trust: "<i class=\"fas fa-shield-alt text-green-500 mr-2\"></i> 100% lokale Verarbeitung. Ihre Dateien verlassen nie Ihren Browser.",
+                footer_legal_title: "Rechtliches",
+                footer_privacy: "Datenschutzerklärung",
+                footer_terms: "Nutzungsbedingungen",
+                footer_support_title: "Projekt unterstützen",
+                footer_support_text: "Wir halten dieses Tool dank der Community kostenlos.",
+                cookie_message: "Dieses Tool ist kostenlos und privat (lokale Verarbeitung). Wir verwenden Cookies, um Anzeigen zu zeigen, die das Projekt finanzieren. Unterstützen Sie uns durch Akzeptieren?",
+                cookie_privacy_link: "Mehr erfahren",
+                cookie_accept: "Akzeptieren & Gratis nutzen",
+                cookie_decline: "Ablehnen",
+                footer_cookie_settings: "Cookie-Einstellungen"
+            },
+            fr: {
+                title_main: "PDF Quick-Tool",
+                subtitle_main: "L'outil ultime pour <strong>fusionner des PDF en ligne gratuitement</strong> et <strong>extraire du texte de PDF sans inscription</strong>. 100% privé et sécurisé.",
+                tab_merge: "Fusionner des PDF",
+                tab_extract: "Extraire le texte",
+                tab_remove: "Supprimer des pages",
+                drop_zone_title: "Déposez vos fichiers ici ou cliquez pour télécharger",
+                drop_zone_subtitle: "Seuls les fichiers .pdf sont pris en charge",
+                pages_to_remove: "Pages à supprimer (ex: 1, 3-5):",
+                process_btn: "Traiter le fichier",
+                processing_btn: "Traitement...",
+                seo_h2: "Comment fusionner des PDF en ligne gratuitement avec cet outil ?",
+                seo_p: "Notre outil utilise la technologie de <strong>traitement côté client</strong>. Contrairement à d'autres sites, nous ne téléchargeons pas vos documents sur un serveur externe. Tout se passe dans la mémoire de votre navigateur, ce qui en fait l'option la plus rapide et la plus sûre pour les documents sensibles.",
+                seo_h3: "Avantages de l'extraction de texte de PDF sans inscription",
+                seo_li1: "<strong>Confidentialité:</strong> Vos données bancaires ou personnelles ne quittent pas votre PC.",
+                seo_li2: "<strong>Vitesse:</strong> Pas de file d'attente ni de temps de téléchargement.",
+                seo_li3: "<strong>Sans limites:</strong> Traitez de gros fichiers sans les restrictions d'un compte premium.",
+                faq_title: "Foire Aux Questions (FAQ)",
+                faq_q1: "Est-il sûr de télécharger mes documents ?",
+                faq_a1: "Absolument. PDF Quick-Tool traite les fichiers localement. Vos PDF ne sont jamais envoyés dans le cloud.",
+                faq_q2: "Y a-t-il un coût ou une limite d'utilisation ?",
+                faq_a2: "Non. C'est totalement gratuit et ne nécessite aucune inscription préalable.",
+                footer_copy: "&copy; 2024 PDF Quick-Tool. Outil open source pour le traitement local.",
+                alert_pdf_loading: "La bibliothèque PDF est en cours de chargement. Veuillez réessayer dans un instant.",
+                alert_pdfjs_loading: "La bibliothèque PDF.js est en cours de chargement. Veuillez réessayer dans un instant.",
+                alert_error: "Erreur de traitement: ",
+                file_merged: "fusionne.pdf",
+                file_extracted: "texte_extrait_",
+                file_modified: "modifie.pdf",
+                page_text: "Page",
+                page_title: "PDF Quick-Tool : Fusionner, Séparer et Extraire du Texte Gratuitement en Ligne",
+                meta_description: "Outil gratuit pour fusionner des PDF, extraire du texte et supprimer des pages localement. Confidentialité totale : vos fichiers ne quittent jamais votre navigateur.",
+                meta_keywords: "fusionner pdf en ligne gratuit, extraire texte pdf sans inscription, supprimer pages pdf, pdf quick-tool",
+                footer_trust: "<i class=\"fas fa-shield-alt text-green-500 mr-2\"></i> Traitement 100% local. Vos fichiers ne quittent jamais votre navigateur.",
+                footer_legal_title: "Mentions légales",
+                footer_privacy: "Politique de confidentialité",
+                footer_terms: "Conditions d'utilisation",
+                footer_support_title: "Soutenir le projet",
+                footer_support_text: "Nous gardons cet outil gratuit grâce à la communauté.",
+                cookie_message: "Cet outil est gratuit et privé (traitement local). Nous utilisons des cookies pour afficher des annonces finançant le projet. Nous soutiendrez-vous en acceptant ?",
+                cookie_privacy_link: "En savoir plus",
+                cookie_accept: "Accepter et utiliser",
+                cookie_decline: "Refuser",
+                footer_cookie_settings: "Paramètres des cookies"
+            }
+        };
+
+        let currentLang = localStorage.getItem('pdfqt_lang') || (navigator.language.startsWith('es') ? 'es' : 'en');
+
+        function changeLanguage(lang) {
+            // Revertir a 'en' si el lenguaje no está en nuestro diccionario
+            if (!translations[lang]) lang = 'en';
+
+            currentLang = lang;
+            localStorage.setItem('pdfqt_lang', lang);
+            document.documentElement.lang = lang;
+            document.getElementById('lang-select').value = lang;
+
+            // Actualizar etiquetas en el DOM
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Actualizar SEO (Títulos y Metadatos Dinámicos)
+            if (translations[lang].page_title) {
+                document.title = translations[lang].page_title;
+                document.querySelector('meta[property="og:title"]').content = translations[lang].page_title;
+            }
+            if (translations[lang].meta_description) {
+                document.querySelector('meta[name="description"]').content = translations[lang].meta_description;
+                document.querySelector('meta[property="og:description"]').content = translations[lang].meta_description;
+            }
+            if (translations[lang].meta_keywords) {
+                document.querySelector('meta[name="keywords"]').content = translations[lang].meta_keywords;
+            }
+
+            // Actualizar estado del botón de procesamiento
+            if (!document.getElementById('loader').classList.contains('hidden')) {
+                document.getElementById('btn-text').innerText = translations[currentLang].processing_btn;
+            } else {
+                document.getElementById('btn-text').innerText = translations[currentLang].process_btn;
+            }
+        }
+
+        /* --- LOGICA DE COOKIES Y ANUNCIOS (GDPR) --- */
+        const cookieBanner = document.getElementById('cookie-banner');
+
+        async function checkConsent() {
+            const consent = localStorage.getItem('pdfqt_consent');
+            if (consent === 'true') {
+                loadAds();
+            } else if (consent === 'false') {
+                // El usuario ya rechazó explícitamente, no mostramos banner ni anuncios
+            } else {
+                // No hay decisión guardada, verificamos origen por IP para GDPR/LGPD
+                try {
+                    // API Gratuita sin límites para identificar país
+                    const response = await fetch('https://get.geojs.io/v1/ip/country.json');
+                    const data = await response.json();
+
+                    // Países con leyes de opt-in estricto (Unión Europea, Reino Unido, Brasil)
+                    const strictConsentCountries = ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'GB', 'BR'];
+
+                    if (!strictConsentCountries.includes(data.country)) {
+                        // Fuera de Europa/Brasil (Ej. Argentina), asumimos el Opt-out legítimo
+                        console.log("Región detectada (" + data.country + "): Opt-in no estricto. Cargando anuncios automáticamente...");
+                        localStorage.setItem('pdfqt_consent', 'true');
+                        loadAds();
+                    } else {
+                        // Región estricta, requerimos confirmación activa
+                        showConsentBanner();
+                    }
+                } catch (error) {
+                    // Si algo falla por red o adblock, mostramos el banner por curarnos en salud legal
+                    console.error("No se pudo verificar región, asumiendo requerimiento estricto:", error);
+                    showConsentBanner();
+                }
+            }
+        }
+
+        function showConsentBanner() {
+            setTimeout(() => {
+                cookieBanner.classList.remove('translate-y-full');
+            }, 1000);
+        }
+
+        function acceptCookies() {
+            localStorage.setItem('pdfqt_consent', 'true');
+            cookieBanner.classList.add('translate-y-full');
+            loadAds();
+        }
+
+        function declineCookies() {
+            localStorage.setItem('pdfqt_consent', 'false');
+            cookieBanner.classList.add('translate-y-full');
+
+            // Opcional: borrar el texto "Esperando consentimiento" si rechazaron
+            ['ad-header', 'ad-post-action', 'ad-sidebar'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.innerHTML.includes('Esperando')) el.innerHTML = 'Espacio libre de anuncios';
+            });
+        }
+
+        function resetConsent(e) {
+            e.preventDefault();
+            localStorage.removeItem('pdfqt_consent');
+            location.reload(); // Recarga para volver a evaluar la lógica desde cero
+        }
+
+        function loadAds() {
+            // Ejemplo de inyección dinámica de scripts de anuncios (Placeholder para Adsterra o Adsense)
+            console.log("Consentimiento otorgado: Cargando scripts publicitarios de terceros...");
+
+            const adHeader = document.getElementById('ad-header');
+            if (adHeader) adHeader.innerHTML = 'ANUNCIO CARGADO (Header)';
+
+            const adPostAction = document.getElementById('ad-post-action');
+            if (adPostAction) adPostAction.innerHTML = 'ANUNCIO CARGADO (Contenido)';
+
+            const adSidebar = document.getElementById('ad-sidebar');
+            if (adSidebar) adSidebar.innerHTML = 'ANUNCIO CARGADO (Sidebar)';
+
+            // Aquí agregarías la lógica real, ejemplo:
+            // const script = document.createElement('script');
+            // script.src = 'URL_DEL_NETWORK_DE_ANUNCIOS';
+            // document.body.appendChild(script);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            changeLanguage(currentLang);
+            checkConsent();
+        });
+
+        // Reemplaza la línea: const { PDFDocument } = PDFLib;
+        // Por esta lógica de inicialización segura:
+        const getPDFDoc = () => window.PDFLib ? window.PDFLib.PDFDocument : null;
+
+        let currentTab = 'merge';
+        let selectedFiles = [];
+
+        // Tab Management
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+            document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            document.getElementById('remove-pages-config').classList.toggle('hidden', tab !== 'remove');
+            resetUI();
+        }
+
+        function resetUI() {
+            selectedFiles = [];
+            document.getElementById('file-list').innerHTML = '';
+            document.getElementById('config-area').classList.add('hidden');
+        }
+
+        // File Selection Logic
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+
+        dropZone.onclick = () => fileInput.click();
+
+        // Drag and Drop Handlers
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drop-zone--over');
+        });
+
+        ['dragleave', 'dragend'].forEach(type => {
+            dropZone.addEventListener(type, () => {
+                dropZone.classList.remove('drop-zone--over');
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drop-zone--over');
+            if (e.dataTransfer.files.length > 0) {
+                handleFiles(Array.from(e.dataTransfer.files));
+            }
+        });
+
+        fileInput.onchange = (e) => {
+            if (e.target.files.length > 0) {
+                handleFiles(Array.from(e.target.files));
+            }
+        };
+
+        function handleFiles(files) {
+            const pdfFiles = files.filter(f => f.name.toLowerCase().endsWith('.pdf'));
+
+            if (pdfFiles.length === 0) return;
+
+            if (currentTab === 'merge') {
+                // Agregar archivos a la lista existente
+                selectedFiles = [...selectedFiles, ...pdfFiles];
+            } else {
+                // Solo un archivo para extraer o eliminar
+                selectedFiles = [pdfFiles[0]];
+            }
+            updateFileList();
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+        }
+
+        function updateFileList() {
+            const list = document.getElementById('file-list');
+            list.innerHTML = selectedFiles.map((f, index) => `
+                <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-between group animate-fade-in">
+                    <div class="flex items-center overflow-hidden">
+                        <i class="fas fa-file-pdf text-blue-500 mr-3 flex-shrink-0"></i>
+                        <span class="truncate text-sm font-medium">${f.name}</span>
+                    </div>
+                    <button onclick="removeFile(${index})" class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Eliminar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            if (selectedFiles.length > 0) {
+                document.getElementById('config-area').classList.remove('hidden');
+            } else {
+                document.getElementById('config-area').classList.add('hidden');
+            }
+        }
+
+        // PDF Processing
+        document.getElementById('process-btn').onclick = async () => {
+            if (currentTab === 'merge' && selectedFiles.length < 2) {
+                alert(currentLang === 'es' ? 'Selecciona al menos 2 archivos para unir.' : 'Please select at least 2 files to merge.');
+                return;
+            }
+            const loader = document.getElementById('loader');
+            const btnText = document.getElementById('btn-text');
+
+            loader.classList.remove('hidden');
+            btnText.innerText = translations[currentLang].processing_btn;
+
+            try {
+                if (currentTab === 'merge') {
+                    await mergePDFs();
+                } else if (currentTab === 'extract') {
+                    await extractText();
+                } else if (currentTab === 'remove') {
+                    await removePages();
+                }
+            } catch (err) {
+                alert(translations[currentLang].alert_error + err.message);
+            } finally {
+                loader.classList.add('hidden');
+                btnText.innerText = translations[currentLang].process_btn;
+            }
+        };
+
+        async function mergePDFs() {
+            const PDFDocument = getPDFDoc();
+            if (!PDFDocument) {
+                alert(translations[currentLang].alert_pdf_loading);
+                return;
+            }
+
+            const mergedPdf = await PDFDocument.create();
+            for (const file of selectedFiles) {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(arrayBuffer);
+                const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                copiedPages.forEach(page => mergedPdf.addPage(page));
+            }
+            download(await mergedPdf.save(), translations[currentLang].file_merged);
+        }
+
+        async function extractText() {
+            if (typeof pdfjsLib === 'undefined') {
+                alert(translations[currentLang].alert_pdfjs_loading);
+                return;
+            }
+
+            const file = selectedFiles[0];
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+            let fullText = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                fullText += `--- ${translations[currentLang].page_text} ${i} ---\n${pageText}\n\n`;
+            }
+
+            const blob = new Blob([fullText], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = translations[currentLang].file_extracted + file.name.replace('.pdf', '') + ".txt";
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function removePages() {
+            const PDFDocument = getPDFDoc();
+            if (!PDFDocument) {
+                alert(translations[currentLang].alert_pdf_loading);
+                return;
+            }
+
+            const file = selectedFiles[0];
+            const indicesStr = document.getElementById('pages-to-remove').value;
+
+            // Parse comma-separated values and ranges (e.g., "1, 3-5")
+            const indicesToRemove = new Set();
+            if (indicesStr.trim()) {
+                const parts = indicesStr.split(',');
+                for (const part of parts) {
+                    const trimmedPart = part.trim();
+                    if (trimmedPart.includes('-')) {
+                        const [start, end] = trimmedPart.split('-').map(n => parseInt(n.trim()));
+                        if (!isNaN(start) && !isNaN(end) && start <= end) {
+                            for (let i = start; i <= end; i++) {
+                                indicesToRemove.add(i - 1); // 0-indexed
+                            }
+                        }
+                    } else {
+                        const num = parseInt(trimmedPart);
+                        if (!isNaN(num)) {
+                            indicesToRemove.add(num - 1); // 0-indexed
+                        }
+                    }
+                }
+            }
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await PDFDocument.load(arrayBuffer);
+
+            // Lógica inversa: mantener las páginas que no están en la lista
+            const total = pdf.getPageCount();
+            const newPdf = await PDFDocument.create();
+            const indicesToRemoveArray = Array.from(indicesToRemove);
+            const indicesToKeep = Array.from({ length: total }, (_, i) => i).filter(i => !indicesToRemoveArray.includes(i));
+
+            const copiedPages = await newPdf.copyPages(pdf, indicesToKeep);
+            copiedPages.forEach(page => newPdf.addPage(page));
+
+            download(await newPdf.save(), translations[currentLang].file_modified);
+        }
+
+        function download(data, name) {
+            const blob = new Blob([data], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = name;
+            a.click();
+        }
+    </script>
+</body>
+
+</html>
