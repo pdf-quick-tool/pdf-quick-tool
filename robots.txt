@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /seguro.html
+Disallow: /seguro2.html
+
+Sitemap: https://pdf-quick-tool.github.io/sitemap.xml
