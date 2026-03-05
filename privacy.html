@@ -4,71 +4,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Política de Privacidad | PDF Quick-Tool</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title id="page-title">Política de Privacidad | PDF Quick-Tool</title>
+    <meta name="description"
+        content="Política de privacidad de PDF Quick-Tool. Procesamiento 100% local, sin subida de archivos a servidores.">
+    <meta name="robots" content="noindex, follow">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>">
+
+    <!-- Scripts & Estilos optimizados -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff2"
+        as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        media="print" onload="this.media='all'; this.onload=null;">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    </noscript>
 </head>
 
 <body
     class="bg-gray-50 text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100 flex flex-col min-h-screen">
+
     <header class="container mx-auto px-4 py-8 text-center border-b border-gray-200 dark:border-gray-800">
         <h1 class="text-3xl font-bold mb-2">PDF Quick-Tool</h1>
-        <p class="text-gray-500">Política de Privacidad</p>
-        <a href="index.html" class="inline-block mt-4 text-blue-600 dark:text-blue-400 hover:underline"><i
-                class="fas fa-arrow-left mr-2"></i>Volver a la herramienta</a>
+        <p id="page-subtitle" class="text-gray-500">Política de Privacidad</p>
+        <a href="index.html" id="back-link" class="inline-block mt-4 text-blue-600 dark:text-blue-400 hover:underline">
+            <i class="fas fa-arrow-left mr-2"></i><span>Volver a la herramienta</span>
+        </a>
     </header>
 
     <main class="container mx-auto px-4 py-12 flex-grow max-w-4xl">
-        <article class="prose dark:prose-invert max-w-none bg-white dark:bg-gray-800 p-8 rounded-2xl shadow">
-            <h2>1. Procesamiento 100% Local</h2>
-            <p>La principal característica de seguridad de PDF Quick-Tool es que <strong>no sube ni envía tus archivos a
-                    ningún servidor externo</strong>. Todo el procesamiento (unir PDFs, extraer texto, eliminar páginas)
-                se realiza exclusivamente dentro de la memoria de tu propio navegador web usando tecnologías del lado
-                del cliente.</p>
-
-            <h2>2. Recopilación de Datos y Archivos PDF</h2>
-            <p><strong>Nosotros no vemos, copiamos, ni almacenamos tus documentos PDF.</strong> Dado que el
-                procesamiento es local, todo el código se ejecuta en tu dispositivo. Una vez que cierras la pestaña o el
-                navegador, la información procesada desaparece por completo.</p>
-
-            <h2>3. Uso de Cookies y Terceros (Monetización)</h2>
-            <p>Para mantener esta herramienta gratuita e independiente, utilizamos redes publicitarias de terceros
-                (tales como Adsterra, Google AdSense, u otros proveedores de anuncios). Estas redes pueden utilizar
-                <strong>cookies</strong> o tecnologías similares (como balizas web) para recopilar información técnica
-                sobre tu visita con el fin de mostrarte anuncios relevantes y medir el rendimiento de sus campañas
-                publicitarias.
-            </p>
-            <p>En cumplimiento con las normativas europeas (RGPD/GDPR), <strong>no cargamos ningún script publicitario y
-                    no se guarda ninguna cookie de terceros hasta que hagas clic explícitamente en el botón
-                    "Aceptar"</strong> en nuestro banner de consentimiento.</p>
-
-            <h2>4. ¿Qué datos pueden recopilar las redes de anuncios?</h2>
-            <p>Si das tu consentimiento, los proveedores publicitarios pueden recopilar de forma automatizada:</p>
-            <ul>
-                <li>Dirección IP (generalmente de forma anónima/truncada).</li>
-                <li>Tipo de navegador y sistema operativo.</li>
-                <li>Páginas visitadas dentro de este sitio web.</li>
-                <li>Interacciones con los anuncios.</li>
-            </ul>
-            <p>Es importante destacar que <strong>no tienen acceso a los archivos PDF</strong> que procesas en la
-                herramienta, ya que estos permanecen estrictamente en la memoria de tu navegador.</p>
-
-            <h2>5. Tu Control sobre las Cookies</h2>
-            <p>Puedes cambiar tu decisión en cualquier momento borrando el almacenamiento local (localStorage) de tu
-                navegador para este sitio, o usando la configuración de tu navegador para bloquear las cookies de
-                terceros de forma general.</p>
-
-            <h2>6. Cambios en esta Política</h2>
-            <p>Nos reservamos el derecho de actualizar esta Política de Privacidad en cualquier momento. Siempre te
-                recomendaremos revisar esta página en caso de dudas futuras.</p>
+        <article id="content"
+            class="prose dark:prose-invert max-w-none bg-white dark:bg-gray-800 p-8 rounded-2xl shadow">
+            <!-- El contenido se inyecta por JS -->
         </article>
     </main>
 
     <footer class="bg-gray-100 dark:bg-gray-950 py-8 text-center text-sm text-gray-500">
-        <p>&copy; 2024 PDF Quick-Tool. Herramienta de procesamiento local.</p>
+        <p>&copy; 2024 PDF Quick-Tool.</p>
         <p class="mt-2">Contacto: <a href="mailto:soporte.pdfquicktool@gmail.com"
                 class="text-blue-600 dark:text-blue-400 hover:underline">soporte.pdfquicktool@gmail.com</a></p>
     </footer>
+
+    <script>
+        const privacyContent = {
+            es: {
+                title: "Política de Privacidad | PDF Quick-Tool",
+                subtitle: "Política de Privacidad",
+                back: "Volver a la herramienta",
+                body: `
+                    <h2>1. Procesamiento 100% Local</h2>
+                    <p>La principal característica de seguridad de PDF Quick-Tool es que <strong>no sube ni envía tus archivos a ningún servidor externo</strong>. Todo el procesamiento (unir PDFs, extraer texto, eliminar páginas) se realiza exclusivamente dentro de la memoria de tu propio navegador web usando tecnologías del lado del cliente.</p>
+
+                    <h2>2. Recopilación de Datos y Archivos PDF</h2>
+                    <p><strong>Nosotros no vemos, copiamos, ni almacenamos tus documentos PDF.</strong> Dado que el procesamiento es local, todo el código se ejecuta en tu dispositivo. Una vez que cierras la pestaña o el navegador, la información procesada desaparece por completo.</p>
+
+                    <h2>3. Uso de Cookies y Terceros (Monetización)</h2>
+                    <p>Para mantener esta herramienta gratuita e independiente, utilizamos redes publicitarias de terceros (tales como Adsterra u otros proveedores). Estas redes pueden utilizar <strong>cookies</strong> o tecnologías similares para recopilar información técnica sobre tu visita con el fin de mostrarte anuncios relevantes.</p>
+                    <p>En cumplimiento con las normativas europeas (RGPD/GDPR) y brasileñas (LGPD), <strong>no cargamos ningún script publicitario y no se guarda ninguna cookie de terceros hasta que hagas clic explícitamente en "Aceptar"</strong> en nuestro banner de consentimiento.</p>
+
+                    <h2>4. ¿Qué datos pueden recopilar las redes de anuncios?</h2>
+                    <p>Si das tu consentimiento, los proveedores publicitarios pueden recopilar de forma automatizada:</p>
+                    <ul>
+                        <li>Dirección IP (generalmente de forma anónima/truncada).</li>
+                        <li>Tipo de navegador y sistema operativo.</li>
+                        <li>Páginas visitadas dentro de este sitio web.</li>
+                        <li>Interacciones con los anuncios.</li>
+                    </ul>
+                    <p>Es importante destacar que <strong>no tienen acceso a los archivos PDF</strong> que procesas en la herramienta.</p>
+
+                    <h2>5. Tu Control sobre las Cookies</h2>
+                    <p>Puedes cambiar tu decisión en cualquier momento usando la opción "Configuración de Cookies" en el footer de la herramienta, o borrando el almacenamiento local de tu navegador para este sitio.</p>
+
+                    <h2>6. Cambios en esta Política</h2>
+                    <p>Nos reservamos el derecho de actualizar esta Política de Privacidad en cualquier momento. Te recomendamos revisar esta página en caso de dudas futuras.</p>
+                `
+            },
+            en: {
+                title: "Privacy Policy | PDF Quick-Tool",
+                subtitle: "Privacy Policy",
+                back: "Back to the tool",
+                body: `
+                    <h2>1. 100% Local Processing</h2>
+                    <p>PDF Quick-Tool's main security feature is that it <strong>does not upload or send your files to any external server</strong>. All processing (merging PDFs, extracting text, removing pages) is done exclusively within your browser's memory using client-side technologies.</p>
+
+                    <h2>2. Data Collection and PDF Files</h2>
+                    <p><strong>We do not see, copy, or store your PDF documents.</strong> Since the processing is local, all code runs on your device. Once you close the tab or browser, the processed information disappears completely.</p>
+
+                    <h2>3. Cookies and Third Parties (Monetization)</h2>
+                    <p>To keep this tool free and independent, we use third-party advertising networks (such as Adsterra or other providers). These networks may use <strong>cookies</strong> or similar technologies to collect technical information about your visit in order to show you relevant ads.</p>
+                    <p>In compliance with European (GDPR) and Brazilian (LGPD) regulations, <strong>we do not load any advertising scripts and no third-party cookies are stored until you explicitly click "Accept"</strong> on our consent banner.</p>
+
+                    <h2>4. What data can advertising networks collect?</h2>
+                    <p>If you give your consent, advertising providers may automatically collect:</p>
+                    <ul>
+                        <li>IP address (generally anonymized/truncated).</li>
+                        <li>Browser type and operating system.</li>
+                        <li>Pages visited within this website.</li>
+                        <li>Interactions with ads.</li>
+                    </ul>
+                    <p>Importantly, they <strong>do not have access to the PDF files</strong> you process in the tool.</p>
+
+                    <h2>5. Your Control Over Cookies</h2>
+                    <p>You can change your decision at any time using the "Cookie Settings" option in the tool's footer, or by clearing your browser's local storage for this site.</p>
+
+                    <h2>6. Changes to This Policy</h2>
+                    <p>We reserve the right to update this Privacy Policy at any time. We recommend reviewing this page in case of future questions.</p>
+                `
+            },
+            pt: {
+                title: "Política de Privacidade | PDF Quick-Tool",
+                subtitle: "Política de Privacidade",
+                back: "Voltar à ferramenta",
+                body: `
+                    <h2>1. Processamento 100% Local</h2>
+                    <p>A principal característica de segurança do PDF Quick-Tool é que ele <strong>não envia seus arquivos para nenhum servidor externo</strong>. Todo o processamento (unir PDFs, extrair texto, remover páginas) é feito exclusivamente na memória do seu navegador usando tecnologias do lado do cliente.</p>
+
+                    <h2>2. Coleta de Dados e Arquivos PDF</h2>
+                    <p><strong>Não visualizamos, copiamos nem armazenamos seus documentos PDF.</strong> Como o processamento é local, todo o código é executado no seu dispositivo. Ao fechar a aba ou o navegador, as informações processadas desaparecem completamente.</p>
+
+                    <h2>3. Cookies e Terceiros (Monetização)</h2>
+                    <p>Para manter esta ferramenta gratuita e independente, utilizamos redes de publicidade de terceiros (como Adsterra ou outros provedores). Essas redes podem usar <strong>cookies</strong> ou tecnologias similares para coletar informações técnicas sobre sua visita.</p>
+                    <p>Em conformidade com as regulamentações europeias (GDPR) e brasileiras (LGPD), <strong>não carregamos nenhum script publicitário e nenhum cookie de terceiros é armazenado até que você clique explicitamente em "Aceitar"</strong> no nosso banner de consentimento.</p>
+
+                    <h2>4. Quais dados as redes de publicidade podem coletar?</h2>
+                    <p>Se você der seu consentimento, os provedores de publicidade podem coletar automaticamente:</p>
+                    <ul>
+                        <li>Endereço IP (geralmente de forma anônima/truncada).</li>
+                        <li>Tipo de navegador e sistema operacional.</li>
+                        <li>Páginas visitadas neste site.</li>
+                        <li>Interações com anúncios.</li>
+                    </ul>
+                    <p>Importante: eles <strong>não têm acesso aos arquivos PDF</strong> que você processa na ferramenta.</p>
+
+                    <h2>5. Seu Controle sobre os Cookies</h2>
+                    <p>Você pode alterar sua decisão a qualquer momento usando a opção "Configurações de Cookies" no rodapé da ferramenta, ou limpando o armazenamento local do seu navegador para este site.</p>
+
+                    <h2>6. Alterações nesta Política</h2>
+                    <p>Reservamo-nos o direito de atualizar esta Política de Privacidade a qualquer momento. Recomendamos revisar esta página em caso de dúvidas futuras.</p>
+                `
+            },
+            de: {
+                title: "Datenschutzerklärung | PDF Quick-Tool",
+                subtitle: "Datenschutzerklärung",
+                back: "Zurück zum Tool",
+                body: `
+                    <h2>1. 100% lokale Verarbeitung</h2>
+                    <p>Das wichtigste Sicherheitsmerkmal von PDF Quick-Tool ist, dass es <strong>Ihre Dateien nicht auf externe Server hochlädt oder sendet</strong>. Die gesamte Verarbeitung (PDFs zusammenführen, Text extrahieren, Seiten entfernen) erfolgt ausschließlich im Speicher Ihres Browsers mithilfe clientseitiger Technologien.</p>
+
+                    <h2>2. Datenerhebung und PDF-Dateien</h2>
+                    <p><strong>Wir sehen, kopieren oder speichern Ihre PDF-Dokumente nicht.</strong> Da die Verarbeitung lokal erfolgt, läuft der gesamte Code auf Ihrem Gerät. Wenn Sie den Tab oder den Browser schließen, verschwinden die verarbeiteten Informationen vollständig.</p>
+
+                    <h2>3. Cookies und Dritte (Monetarisierung)</h2>
+                    <p>Um dieses Tool kostenlos und unabhängig zu halten, verwenden wir Werbenetzwerke von Drittanbietern (wie Adsterra oder andere). Diese Netzwerke können <strong>Cookies</strong> oder ähnliche Technologien verwenden, um technische Informationen über Ihren Besuch zu sammeln.</p>
+                    <p>In Übereinstimmung mit den europäischen (DSGVO) und brasilianischen (LGPD) Vorschriften <strong>laden wir keine Werbeskripte und es werden keine Drittanbieter-Cookies gespeichert, bis Sie explizit auf "Akzeptieren"</strong> in unserem Zustimmungsbanner geklickt haben.</p>
+
+                    <h2>4. Welche Daten können Werbenetzwerke erheben?</h2>
+                    <p>Wenn Sie Ihre Einwilligung geben, können Werbeanbieter automatisch erheben:</p>
+                    <ul>
+                        <li>IP-Adresse (in der Regel anonymisiert/gekürzt).</li>
+                        <li>Browsertyp und Betriebssystem.</li>
+                        <li>Besuchte Seiten auf dieser Website.</li>
+                        <li>Interaktionen mit Anzeigen.</li>
+                    </ul>
+                    <p>Wichtig: Sie haben <strong>keinen Zugriff auf die PDF-Dateien</strong>, die Sie im Tool verarbeiten.</p>
+
+                    <h2>5. Ihre Kontrolle über Cookies</h2>
+                    <p>Sie können Ihre Entscheidung jederzeit über die Option "Cookie-Einstellungen" in der Fußzeile des Tools ändern oder den lokalen Speicher Ihres Browsers für diese Website löschen.</p>
+
+                    <h2>6. Änderungen dieser Richtlinie</h2>
+                    <p>Wir behalten uns das Recht vor, diese Datenschutzerklärung jederzeit zu aktualisieren. Wir empfehlen, diese Seite bei zukünftigen Fragen zu überprüfen.</p>
+                `
+            },
+            fr: {
+                title: "Politique de Confidentialité | PDF Quick-Tool",
+                subtitle: "Politique de Confidentialité",
+                back: "Retour à l'outil",
+                body: `
+                    <h2>1. Traitement 100% Local</h2>
+                    <p>La principale caractéristique de sécurité de PDF Quick-Tool est qu'il <strong>ne télécharge ni n'envoie vos fichiers à aucun serveur externe</strong>. Tout le traitement (fusion de PDF, extraction de texte, suppression de pages) est effectué exclusivement dans la mémoire de votre navigateur grâce aux technologies côté client.</p>
+
+                    <h2>2. Collecte de Données et Fichiers PDF</h2>
+                    <p><strong>Nous ne voyons, ne copions ni ne stockons vos documents PDF.</strong> Étant donné que le traitement est local, tout le code s'exécute sur votre appareil. Lorsque vous fermez l'onglet ou le navigateur, les informations traitées disparaissent complètement.</p>
+
+                    <h2>3. Cookies et Tiers (Monétisation)</h2>
+                    <p>Pour maintenir cet outil gratuit et indépendant, nous utilisons des réseaux publicitaires tiers (tels qu'Adsterra ou d'autres fournisseurs). Ces réseaux peuvent utiliser des <strong>cookies</strong> ou des technologies similaires pour collecter des informations techniques sur votre visite.</p>
+                    <p>Conformément aux réglementations européennes (RGPD) et brésiliennes (LGPD), <strong>nous ne chargeons aucun script publicitaire et aucun cookie tiers n'est stocké jusqu'à ce que vous cliquiez explicitement sur "Accepter"</strong> dans notre bannière de consentement.</p>
+
+                    <h2>4. Quelles données les réseaux publicitaires peuvent-ils collecter ?</h2>
+                    <p>Si vous donnez votre consentement, les fournisseurs publicitaires peuvent collecter automatiquement :</p>
+                    <ul>
+                        <li>Adresse IP (généralement anonymisée/tronquée).</li>
+                        <li>Type de navigateur et système d'exploitation.</li>
+                        <li>Pages visitées sur ce site.</li>
+                        <li>Interactions avec les annonces.</li>
+                    </ul>
+                    <p>Important : ils <strong>n'ont pas accès aux fichiers PDF</strong> que vous traitez dans l'outil.</p>
+
+                    <h2>5. Votre Contrôle sur les Cookies</h2>
+                    <p>Vous pouvez modifier votre décision à tout moment en utilisant l'option "Paramètres des cookies" dans le pied de page de l'outil, ou en effaçant le stockage local de votre navigateur pour ce site.</p>
+
+                    <h2>6. Modifications de cette Politique</h2>
+                    <p>Nous nous réservons le droit de mettre à jour cette Politique de Confidentialité à tout moment. Nous vous recommandons de consulter cette page en cas de questions futures.</p>
+                `
+            }
+        };
+
+        function applyLanguage() {
+            const lang = localStorage.getItem('pdfqt_lang') || 'es';
+            const t = privacyContent[lang] || privacyContent['es'];
+
+            document.documentElement.lang = lang;
+            document.title = t.title;
+            document.getElementById('page-subtitle').textContent = t.subtitle;
+            document.getElementById('back-link').querySelector('span').textContent = t.back;
+            document.getElementById('content').innerHTML = t.body;
+        }
+
+        applyLanguage();
+    </script>
 </body>
 
 </html>
