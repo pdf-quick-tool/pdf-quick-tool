@@ -962,8 +962,8 @@
                 document.body.appendChild(script);
             };
 
-            // Solo se activa con interacción real del usuario (invisible para Lighthouse)
-            const interactionEvents = ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'];
+            // Solo se activa con interacción decidida (click o tecla)
+            const interactionEvents = ['keydown', 'click'];
             const onFirstInteraction = () => {
                 loadKofi();
                 
