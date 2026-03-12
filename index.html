@@ -116,12 +116,6 @@
 
 <body class="bg-gray-50 text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100">
 
-    <!-- AD_SPACE: Header -->
-    <div id="ad-header"
-        class="w-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-xs text-gray-600 dark:text-gray-400 min-h-[90px] overflow-hidden">
-        AD_SPACE - Header Banner (Esperando consentimiento)
-    </div>
-
     <!-- Navegación y Título -->
     <header class="container mx-auto px-4 py-8 text-center relative">
         <div class="absolute top-0 right-4 mt-4">
@@ -271,16 +265,7 @@
                                 class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin">
                             </div>
                         </button>
-                    </div>
-                </section>
-
-                <!-- AD_SPACE: Post-Action -->
-                <div id="ad-post-action"
-                    class="w-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center rounded-lg text-xs text-gray-600 dark:text-gray-400 min-h-[250px] mt-8 overflow-hidden">
-                    AD_SPACE - Below Action Button (Esperando consentimiento)
-                </div>
-
-                <!-- Sección SEO de Contenido -->
+                <!-- Contenido SEO -->
                 <article class="prose dark:prose-invert max-w-none mt-12">
                     <h2 class="text-2xl font-bold" data-i18n="seo_h2">¿Cómo unir PDF gratis online con esta herramienta?
                     </h2>
@@ -328,6 +313,9 @@
             </aside>
         </div>
     </main>
+
+    <!-- Native Banner Ad - relocated for better UX -->
+    <div id="native-banner-container" class="w-full flex justify-center my-8 min-h-[90px]"></div>
 
     <footer class="bg-gray-100 dark:bg-gray-950 py-12 mt-20 border-t dark:border-gray-800 pb-32">
         <!-- pb-32 para el banner de cookies -->
@@ -880,7 +868,30 @@
             location.reload(); // Recarga para volver a evaluar la lógica desde cero
         }
 
-        // Adsterra ads removed - caused aggressive redirections on mobile data
+        // Native Banner - loads ONLY after first user click (safe, no redirects)
+        let adsLoaded = false;
+        async function loadAds() {
+            if (adsLoaded) return;
+            adsLoaded = true;
+            if (localStorage.getItem('pdfqt_consent') !== 'true') return;
+            console.log('Cargando Native Banner...');
+            const script = document.createElement('script');
+            script.async = true;
+            script.dataset.cfasync = 'false';
+            script.src = 'https://pl28904959.effectivegatecpm.com/9c0160470687def6fc582f0096557057/invoke.js';
+            // Native banner needs its container div in the DOM before the script runs
+            const container = document.getElementById('container-9c0160470687def6fc582f0096557057');
+            if (!container) {
+                // If container doesn't exist, create it inside native-banner-container
+                const wrapper = document.getElementById('native-banner-container');
+                if (wrapper) {
+                    const div = document.createElement('div');
+                    div.id = 'container-9c0160470687def6fc582f0096557057';
+                    wrapper.appendChild(div);
+                }
+            }
+            document.body.appendChild(script);
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             cookieBanner = document.getElementById('cookie-banner');
@@ -918,6 +929,7 @@
             const interactionEvents = ['keydown', 'click'];
             const onFirstInteraction = () => {
                 loadKofi();
+                loadAds();
                 interactionEvents.forEach(ev => window.removeEventListener(ev, onFirstInteraction));
             };
             interactionEvents.forEach(ev => window.addEventListener(ev, onFirstInteraction, { passive: true }));
