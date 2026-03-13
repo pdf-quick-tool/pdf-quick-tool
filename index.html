@@ -983,99 +983,63 @@
             // Mostrar info en página
             showBannerDebug(container, bannerContainer);
             
-            // Sistema de fallback con múltiples proveedores
-            const adProviders = [
-                {
-                    name: 'EffectiveGate CPM',
-                    url: 'https://pl28904959.effectivegatecpm.com/9c0160470687def6fc582f0096557057/invoke.js',
-                    containerId: 'container-9c0160470687def6fc582f0096557057'
-                },
-                {
-                    name: 'Adsterra Fallback',
-                    url: 'https://ads.adsterracom.com/banner.js?scriptid=12345&zoneid=67890',
-                    containerId: 'container-9c0160470687def6fc582f0096557057',
-                    isFallback: true
-                },
-                {
-                    name: 'PropellerAds Fallback',
-                    url: 'https://propellerads.com/push.js?zoneid=123456',
-                    containerId: 'container-9c0160470687def6fc582f0096557057',
-                    isFallback: true
-                }
-            ];
+            // Detectar si es móvil para usar banner directo
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            let currentProviderIndex = 0;
+            if (isMobile) {
+                console.log('📱 Móvil detectado - Usando banner directo (no bloqueable)');
+                loadDirectBanner(container);
+                return;
+            }
             
-            const tryNextProvider = (providerIndex) => {
-                if (providerIndex >= adProviders.length) {
-                    console.log('❌ Todos los proveedores fallaron - Mostrando banner alternativo');
-                    showFallbackBanner();
-                    return;
-                }
-                
-                const provider = adProviders[providerIndex];
-                console.log(`Intentando proveedor ${providerIndex + 1}: ${provider.name}`);
-                
-                if (provider.isFallback) {
-                    showBannerError(`Intentando fallback: ${provider.name}`);
-                }
-                
-                const script = document.createElement('script');
-                script.async = true;
-                script.dataset.cfasync = 'false';
-                script.src = provider.url;
-                
-                const timeout = setTimeout(() => {
-                    console.log(`⏰ Timeout ${provider.name} - Intentando siguiente...`);
-                    script.remove();
-                    tryNextProvider(providerIndex + 1);
-                }, 5000); // 5 segundos timeout
-                
-                script.onload = () => {
-                    clearTimeout(timeout);
-                    console.log(`✅ Script ${provider.name} cargado exitosamente`);
-                    
-                    setTimeout(() => {
-                        const hasContent = container && container.innerHTML.trim() !== '';
-                        console.log(`¿El banner ${provider.name} tiene contenido?`, hasContent);
-                        
-                        if (hasContent) {
-                            console.log(`🎉 ${provider.name} funcionando correctamente`);
-                            showBannerSuccess(provider.name);
-                        } else {
-                            console.log(`❌ ${provider.name} container vacío - Intentando siguiente...`);
-                            tryNextProvider(providerIndex + 1);
-                        }
-                    }, 3000);
-                };
-                
-                script.onerror = (error) => {
-                    clearTimeout(timeout);
-                    console.error(`❌ Error cargando ${provider.name}:`, error);
-                    tryNextProvider(providerIndex + 1);
-                };
-                
-                document.body.appendChild(script);
+            // Para desktop, intentar con el script original
+            console.log('� Desktop detectado - Intentando script original');
+            const script = document.createElement('script');
+            script.async = true;
+            script.dataset.cfasync = 'false';
+            script.src = 'https://pl28904959.effectivegatecpm.com/9c0160470687def6fc582f0096557057/invoke.js';
+            
+            script.onload = () => {
+                console.log('✅ Script del banner cargado exitosamente');
+                setTimeout(() => {
+                    const hasContent = container && container.innerHTML.trim() !== '';
+                    console.log('¿El banner tiene contenido?', hasContent);
+                    if (hasContent) {
+                        showBannerSuccess('EffectiveGate CPM');
+                    } else {
+                        console.log('❌ El container está vacío - Usando banner directo');
+                        loadDirectBanner(container);
+                    }
+                }, 3000);
             };
             
-            // Iniciar con el primer proveedor
-            tryNextProvider(0);
+            script.onerror = (error) => {
+                console.error('❌ Error cargando script del banner:', error);
+                loadDirectBanner(container);
+            };
+            
+            document.body.appendChild(script);
         }
         
-        function showFallbackBanner() {
-            // Mostrar un banner simple local cuando todos fallan
-            const container = document.getElementById('container-9c0160470687def6fc582f0096557057');
+        function loadDirectBanner(container) {
+            // Banner directo que funciona en móviles sin bloqueo
             if (container) {
                 container.innerHTML = `
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; font-family: Arial, sans-serif;">
-                        <h3 style="margin: 0 0 10px 0; font-size: 18px;">📄 PDF Quick-Tool</h3>
-                        <p style="margin: 0 0 15px 0; font-size: 14px;">¿Te gusta nuestra herramienta gratuita?</p>
-                        <button onclick="window.open('https://ko-fi.com/pdfquicktool', '_blank')" style="background: white; color: #667eea; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;">
-                            ☕ Apóyanos con un café
-                        </button>
+                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                        <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">📄 PDF Quick-Tool</div>
+                        <div style="font-size: 14px; margin-bottom: 15px; opacity: 0.9;">Herramienta gratuita para procesar PDFs</div>
+                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <button onclick="window.open('https://ko-fi.com/pdfquicktool', '_blank')" style="background: white; color: #3b82f6; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: transform 0.2s;">
+                                ☕ Apoyar
+                            </button>
+                            <button onclick="window.open('https://github.com/pdf-quick-tool', '_blank')" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                                ⭐ GitHub
+                            </button>
+                        </div>
                     </div>
                 `;
-                showBannerSuccess('Banner local alternativo');
+                console.log('🎉 Banner directo cargado exitosamente');
+                showBannerSuccess('Banner directo');
             }
         }
         
