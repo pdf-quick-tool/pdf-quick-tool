@@ -761,19 +761,16 @@
                 try {
                     country = await getCountry('https://get.geojs.io/v1/ip/country.json');
                 } catch (e) {
-                    console.warn("GeoJS falló, intentando fallback...");
-                    // Fallback: ipapi.co (Suele ser confiable)
+                    console.warn("GeoJS falló, intentando fallback 1 (ipapi.co)...");
                     try {
                         country = await getCountry('https://ipapi.co/json/');
                     } catch (e2) {
-                        console.warn("Fallback 1 falló, intentando fallback final...");
-                        // Fallback 2: ip-api (gratuito)
-                        try {
-                            const res = await fetch('http://ip-api.com/json/');
-                            const data = await res.json();
-                            country = data.countryCode;
-                        } catch (e3) {
-                            console.error("Todos los servicios de geo-detección fallaron.");
+                        console.warn("Fallback 1 falló, intentando hint de navegador...");
+                        // Hint de navegador: si el idioma es español, asumimos región no estricta (LATAM)
+                        const navLang = navigator.language.split('-')[0];
+                        if (navLang === 'es') {
+                            console.log("Hint de navegador: 'es'. Asumimos región no estricta para clics rápidos.");
+                            country = 'LATAM_HINT'; 
                         }
                     }
                 }
@@ -803,9 +800,22 @@
                     // Lista actualizada de países con regulaciones estrictas (EU + Brasil)
                     const strictCountries = ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'GB', 'BR'];
 
+                    // Mostrar país detectado en la página
+                    showCountryInfo(country);
+
+                    // Detectar si es móvil
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    
                     if (country !== 'unknown' && !strictCountries.includes(country)) {
                         console.log("Región no estricta detectada. Auto-consentimiento concedido.");
                         localStorage.setItem('pdfqt_consent', 'true');
+                        loadAds();
+                        loadKofi();
+                        loadAnalytics();
+                    } else if (isMobile) {
+                        // Permitir anuncios en móviles incluso sin consentimiento
+                        console.log("Dispositivo móvil detectado. Cargando anuncios sin consentimiento requerido.");
+                        localStorage.setItem('pdfqt_consent', 'mobile_auto');
                         loadAds();
                         loadKofi();
                         loadAnalytics();
@@ -813,7 +823,7 @@
                         console.log("Región estricta o desconocida. Mostrando banner de consentimiento.");
                         showConsentBanner();
                     }
-                } else if (consent === 'true') {
+                } else if (consent === 'true' || consent === 'mobile_auto') {
                     loadAds();
                     loadKofi();
                     loadAnalytics();
@@ -842,6 +852,25 @@
             cookieBanner.classList.remove('translate-y-full');
         }
 
+        function showCountryInfo(country) {
+            // Crear o actualizar el elemento para mostrar país
+            let countryInfo = document.getElementById('country-info');
+            if (!countryInfo) {
+                countryInfo = document.createElement('div');
+                countryInfo.id = 'country-info';
+                countryInfo.style.cssText = 'position: fixed; top: 10px; left: 10px; background: #fbbf24; color: #000; padding: 5px 10px; border-radius: 5px; font-size: 12px; z-index: 9999; font-weight: bold;';
+                document.body.appendChild(countryInfo);
+            }
+            countryInfo.textContent = `País detectado: ${country}`;
+            
+            // Ocultar después de 5 segundos
+            setTimeout(() => {
+                if (countryInfo) {
+                    countryInfo.style.display = 'none';
+                }
+            }, 5000);
+        }
+
         function acceptCookies() {
             localStorage.setItem('pdfqt_consent', 'true');
             if (cookieBanner) cookieBanner.classList.add('translate-y-full');
@@ -854,10 +883,10 @@
             localStorage.setItem('pdfqt_consent', 'false');
             if (cookieBanner) cookieBanner.classList.add('translate-y-full');
 
-            // Opcional: borrar el texto "Esperando consentimiento" si rechazaron
-            ['ad-header', 'ad-post-action', 'ad-sidebar'].forEach(id => {
+            // Limpiar placeholders
+            ['ad-header', 'ad-post-action', 'ad-sidebar', 'native-banner-container'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el && el.innerHTML.includes('Esperando')) el.innerHTML = 'Espacio libre de anuncios';
+                if (el) el.innerHTML = '';
             });
         }
 
@@ -884,7 +913,13 @@
         let adsLoaded = false;
         let kofiLoaded = false;
         async function loadAds() {
-            if (localStorage.getItem('pdfqt_consent') !== 'true') return;
+            const consent = localStorage.getItem('pdfqt_consent');
+            if (consent !== 'true' && consent !== 'mobile_auto') return;
+
+            // Limpiar placeholder del sidebar si existe
+            const sidebar = document.getElementById('ad-sidebar');
+            if (sidebar) sidebar.innerHTML = '<span class="text-[10px] uppercase tracking-widest opacity-50">Publicidad</span>';
+
             if (adsLoaded) return;
             adsLoaded = true;
             console.log('Cargando Native Banner...');
