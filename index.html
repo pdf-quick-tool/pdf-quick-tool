@@ -983,32 +983,117 @@
             // Mostrar info en página
             showBannerDebug(container, bannerContainer);
             
-            console.log('Cargando Native Banner...');
-            const script = document.createElement('script');
-            script.async = true;
-            script.dataset.cfasync = 'false';
-            script.src = 'https://pl28904959.effectivegatecpm.com/9c0160470687def6fc582f0096557057/invoke.js';
+            // Sistema de fallback con múltiples proveedores
+            const adProviders = [
+                {
+                    name: 'EffectiveGate CPM',
+                    url: 'https://pl28904959.effectivegatecpm.com/9c0160470687def6fc582f0096557057/invoke.js',
+                    containerId: 'container-9c0160470687def6fc582f0096557057'
+                },
+                {
+                    name: 'Adsterra Fallback',
+                    url: 'https://ads.adsterracom.com/banner.js?scriptid=12345&zoneid=67890',
+                    containerId: 'container-9c0160470687def6fc582f0096557057',
+                    isFallback: true
+                },
+                {
+                    name: 'PropellerAds Fallback',
+                    url: 'https://propellerads.com/push.js?zoneid=123456',
+                    containerId: 'container-9c0160470687def6fc582f0096557057',
+                    isFallback: true
+                }
+            ];
             
-            // Eventos del script para debugging
-            script.onload = () => {
-                console.log('✅ Script del banner cargado exitosamente');
-                setTimeout(() => {
-                    const hasContent = container && container.innerHTML.trim() !== '';
-                    console.log('¿El banner tiene contenido?', hasContent);
-                    if (!hasContent) {
-                        console.log('❌ El container está vacío - posible bloqueo');
-                        showBannerError('Container vacío - posible bloqueo de carrier');
-                    }
-                }, 3000);
+            let currentProviderIndex = 0;
+            
+            const tryNextProvider = (providerIndex) => {
+                if (providerIndex >= adProviders.length) {
+                    console.log('❌ Todos los proveedores fallaron - Mostrando banner alternativo');
+                    showFallbackBanner();
+                    return;
+                }
+                
+                const provider = adProviders[providerIndex];
+                console.log(`Intentando proveedor ${providerIndex + 1}: ${provider.name}`);
+                
+                if (provider.isFallback) {
+                    showBannerError(`Intentando fallback: ${provider.name}`);
+                }
+                
+                const script = document.createElement('script');
+                script.async = true;
+                script.dataset.cfasync = 'false';
+                script.src = provider.url;
+                
+                const timeout = setTimeout(() => {
+                    console.log(`⏰ Timeout ${provider.name} - Intentando siguiente...`);
+                    script.remove();
+                    tryNextProvider(providerIndex + 1);
+                }, 5000); // 5 segundos timeout
+                
+                script.onload = () => {
+                    clearTimeout(timeout);
+                    console.log(`✅ Script ${provider.name} cargado exitosamente`);
+                    
+                    setTimeout(() => {
+                        const hasContent = container && container.innerHTML.trim() !== '';
+                        console.log(`¿El banner ${provider.name} tiene contenido?`, hasContent);
+                        
+                        if (hasContent) {
+                            console.log(`🎉 ${provider.name} funcionando correctamente`);
+                            showBannerSuccess(provider.name);
+                        } else {
+                            console.log(`❌ ${provider.name} container vacío - Intentando siguiente...`);
+                            tryNextProvider(providerIndex + 1);
+                        }
+                    }, 3000);
+                };
+                
+                script.onerror = (error) => {
+                    clearTimeout(timeout);
+                    console.error(`❌ Error cargando ${provider.name}:`, error);
+                    tryNextProvider(providerIndex + 1);
+                };
+                
+                document.body.appendChild(script);
             };
             
-            script.onerror = (error) => {
-                console.error('❌ Error cargando script del banner:', error);
-                showBannerError('Error cargando script - posible bloqueo');
-            };
+            // Iniciar con el primer proveedor
+            tryNextProvider(0);
+        }
+        
+        function showFallbackBanner() {
+            // Mostrar un banner simple local cuando todos fallan
+            const container = document.getElementById('container-9c0160470687def6fc582f0096557057');
+            if (container) {
+                container.innerHTML = `
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; font-family: Arial, sans-serif;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px;">📄 PDF Quick-Tool</h3>
+                        <p style="margin: 0 0 15px 0; font-size: 14px;">¿Te gusta nuestra herramienta gratuita?</p>
+                        <button onclick="window.open('https://ko-fi.com/pdfquicktool', '_blank')" style="background: white; color: #667eea; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                            ☕ Apóyanos con un café
+                        </button>
+                    </div>
+                `;
+                showBannerSuccess('Banner local alternativo');
+            }
+        }
+        
+        function showBannerSuccess(providerName) {
+            let bannerSuccess = document.getElementById('banner-success');
+            if (!bannerSuccess) {
+                bannerSuccess = document.createElement('div');
+                bannerSuccess.id = 'banner-success';
+                bannerSuccess.style.cssText = 'position: fixed; top: 180px; left: 10px; background: #10b981; color: white; padding: 8px 12px; border-radius: 5px; font-size: 11px; z-index: 9999; font-weight: bold; max-width: 300px;';
+                document.body.appendChild(bannerSuccess);
+            }
+            bannerSuccess.textContent = `✅ Banner activo: ${providerName}`;
             
-            // The container is now directly in the HTML for reliability
-            document.body.appendChild(script);
+            setTimeout(() => {
+                if (bannerSuccess) {
+                    bannerSuccess.style.display = 'none';
+                }
+            }, 8000);
         }
 
         function loadKofi() {
