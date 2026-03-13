@@ -852,123 +852,6 @@
             cookieBanner.classList.remove('translate-y-full');
         }
 
-        function showCountryInfo(country) {
-            // Crear o actualizar el elemento para mostrar país
-            let countryInfo = document.getElementById('country-info');
-            if (!countryInfo) {
-                countryInfo = document.createElement('div');
-                countryInfo.id = 'country-info';
-                countryInfo.style.cssText = 'position: fixed; top: 10px; left: 10px; background: #fbbf24; color: #000; padding: 8px 12px; border-radius: 8px; font-size: 12px; z-index: 9999; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2); max-width: 250px;';
-                document.body.appendChild(countryInfo);
-            }
-            
-            // Detectar si es móvil correctamente
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const connection = navigator.connection ? navigator.connection.effectiveType : 'Unknown';
-            
-            countryInfo.innerHTML = `
-                <div style="margin-bottom: 5px;">🌍 País: ${country}</div>
-                <div style="margin-bottom: 5px;">📱 Móvil: ${isMobile ? '✅ Sí' : '❌ No'}</div>
-                <div style="margin-bottom: 8px;">📶 Conexión: ${connection}</div>
-                <button onclick="testVPNMode()" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; width: 100%;">
-                    🌐 Probar VPN EE.UU.
-                </button>
-            `;
-            
-            // Ocultar después de 15 segundos
-            setTimeout(() => {
-                if (countryInfo) {
-                    countryInfo.style.display = 'none';
-                }
-            }, 15000);
-        }
-        
-        function testVPNMode() {
-            // Simular acceso desde EE.UU. para pruebas
-            console.log('🌐 Modo VPN activado - Simulando acceso desde EE.UU.');
-            
-            // Forzar desktop mode para probar native banners
-            const originalUserAgent = navigator.userAgent;
-            Object.defineProperty(navigator, 'userAgent', {
-                get: () => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            });
-            
-            // Resetear adsLoaded para forzar recarga
-            if (typeof adsLoaded !== 'undefined') {
-                adsLoaded = false;
-            }
-            
-            // Limpiar container
-            const container = document.getElementById('container-9c0160470687def6fc582f0096557057');
-            if (container) {
-                container.innerHTML = '';
-            }
-            
-            // Mostrar mensaje
-            const vpnMsg = document.createElement('div');
-            vpnMsg.id = 'vpn-test-message';
-            vpnMsg.style.cssText = 'position: fixed; top: 80px; right: 10px; background: #10b981; color: white; padding: 10px 15px; border-radius: 5px; font-size: 12px; z-index: 9999; font-weight: bold;';
-            vpnMsg.innerHTML = '🌐 Modo VPN EE.UU. activado<br>Recarga la página para probar';
-            document.body.appendChild(vpnMsg);
-            
-            setTimeout(() => {
-                if (vpnMsg) {
-                    vpnMsg.style.display = 'none';
-                }
-            }, 8000);
-            
-            // Recargar automáticamente después de 2 segundos
-            setTimeout(() => {
-                location.reload();
-            }, 2000);
-        }
-
-        function showBannerDebug(container, bannerContainer) {
-            // Crear elemento para debugging del banner
-            let bannerDebug = document.getElementById('banner-debug');
-            if (!bannerDebug) {
-                bannerDebug = document.createElement('div');
-                bannerDebug.id = 'banner-debug';
-                bannerDebug.style.cssText = 'position: fixed; top: 50px; left: 10px; background: #3b82f6; color: white; padding: 8px 12px; border-radius: 5px; font-size: 11px; z-index: 9999; font-weight: bold; max-width: 300px;';
-                document.body.appendChild(bannerDebug);
-            }
-            
-            const connection = navigator.connection ? navigator.connection.effectiveType : 'Unknown';
-            bannerDebug.innerHTML = `
-                <div>Banner Debug:</div>
-                <div>Container: ${container ? '✅' : '❌'}</div>
-                <div>Banner Container: ${bannerContainer ? '✅' : '❌'}</div>
-                <div>Connection: ${connection}</div>
-                <div>Mobile: ${/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? '✅' : '❌'}</div>
-            `;
-            
-            // Ocultar después de 10 segundos
-            setTimeout(() => {
-                if (bannerDebug) {
-                    bannerDebug.style.display = 'none';
-                }
-            }, 10000);
-        }
-
-        function showBannerError(message) {
-            // Crear elemento para errores del banner
-            let bannerError = document.getElementById('banner-error');
-            if (!bannerError) {
-                bannerError = document.createElement('div');
-                bannerError.id = 'banner-error';
-                bannerError.style.cssText = 'position: fixed; top: 120px; left: 10px; background: #ef4444; color: white; padding: 8px 12px; border-radius: 5px; font-size: 11px; z-index: 9999; font-weight: bold; max-width: 300px;';
-                document.body.appendChild(bannerError);
-            }
-            bannerError.textContent = `❌ Banner Error: ${message}`;
-            
-            // Ocultar después de 8 segundos
-            setTimeout(() => {
-                if (bannerError) {
-                    bannerError.style.display = 'none';
-                }
-            }, 8000);
-        }
-
         function acceptCookies() {
             localStorage.setItem('pdfqt_consent', 'true');
             if (cookieBanner) cookieBanner.classList.add('translate-y-full');
@@ -1011,8 +894,7 @@
         let adsLoaded = false;
         let kofiLoaded = false;
         async function loadAds() {
-            const consent = localStorage.getItem('pdfqt_consent');
-            if (consent !== 'true' && consent !== 'mobile_auto') return;
+            if (localStorage.getItem('pdfqt_consent') !== 'true') return;
 
             // Limpiar placeholder del sidebar si existe
             const sidebar = document.getElementById('ad-sidebar');
@@ -1020,96 +902,13 @@
 
             if (adsLoaded) return;
             adsLoaded = true;
-            
-            // Debugging: Verificar si el container existe
-            const container = document.getElementById('container-9c0160470687def6fc582f0096557057');
-            const bannerContainer = document.getElementById('native-banner-container');
-            
-            console.log('=== DEBUG NATIVE BANNER ===');
-            console.log('Container ID:', container ? 'EXISTS' : 'MISSING');
-            console.log('Banner Container:', bannerContainer ? 'EXISTS' : 'MISSING');
-            console.log('Consent:', consent);
-            console.log('User Agent:', navigator.userAgent);
-            console.log('Connection:', navigator.connection ? navigator.connection.effectiveType : 'Unknown');
-            
-            // Mostrar info en página
-            showBannerDebug(container, bannerContainer);
-            
-            // Detectar si es móvil para usar banner directo
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                console.log('📱 Móvil detectado - Usando banner directo (no bloqueable)');
-                loadDirectBanner(container);
-                return;
-            }
-            
-            // Para desktop, intentar con el script original
-            console.log('� Desktop detectado - Intentando script original');
+            console.log('Cargando Native Banner...');
             const script = document.createElement('script');
             script.async = true;
             script.dataset.cfasync = 'false';
             script.src = 'https://pl28904959.effectivegatecpm.com/9c0160470687def6fc582f0096557057/invoke.js';
-            
-            script.onload = () => {
-                console.log('✅ Script del banner cargado exitosamente');
-                setTimeout(() => {
-                    const hasContent = container && container.innerHTML.trim() !== '';
-                    console.log('¿El banner tiene contenido?', hasContent);
-                    if (hasContent) {
-                        showBannerSuccess('EffectiveGate CPM');
-                    } else {
-                        console.log('❌ El container está vacío - Usando banner directo');
-                        loadDirectBanner(container);
-                    }
-                }, 3000);
-            };
-            
-            script.onerror = (error) => {
-                console.error('❌ Error cargando script del banner:', error);
-                loadDirectBanner(container);
-            };
-            
+            // The container is now directly in the HTML for reliability
             document.body.appendChild(script);
-        }
-        
-        function loadDirectBanner(container) {
-            // Banner directo que funciona en móviles sin bloqueo
-            if (container) {
-                container.innerHTML = `
-                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                        <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">📄 PDF Quick-Tool</div>
-                        <div style="font-size: 14px; margin-bottom: 15px; opacity: 0.9;">Herramienta gratuita para procesar PDFs</div>
-                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                            <button onclick="window.open('https://ko-fi.com/pdfquicktool', '_blank')" style="background: white; color: #3b82f6; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: transform 0.2s;">
-                                ☕ Apoyar
-                            </button>
-                            <button onclick="window.open('https://github.com/pdf-quick-tool', '_blank')" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                                ⭐ GitHub
-                            </button>
-                        </div>
-                    </div>
-                `;
-                console.log('🎉 Banner directo cargado exitosamente');
-                showBannerSuccess('Banner directo');
-            }
-        }
-        
-        function showBannerSuccess(providerName) {
-            let bannerSuccess = document.getElementById('banner-success');
-            if (!bannerSuccess) {
-                bannerSuccess = document.createElement('div');
-                bannerSuccess.id = 'banner-success';
-                bannerSuccess.style.cssText = 'position: fixed; top: 180px; left: 10px; background: #10b981; color: white; padding: 8px 12px; border-radius: 5px; font-size: 11px; z-index: 9999; font-weight: bold; max-width: 300px;';
-                document.body.appendChild(bannerSuccess);
-            }
-            bannerSuccess.textContent = `✅ Banner activo: ${providerName}`;
-            
-            setTimeout(() => {
-                if (bannerSuccess) {
-                    bannerSuccess.style.display = 'none';
-                }
-            }, 8000);
         }
 
         function loadKofi() {
