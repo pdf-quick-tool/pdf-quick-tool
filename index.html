@@ -315,7 +315,9 @@
     </main>
 
     <!-- Native Banner Ad - relocated for better UX -->
-    <div id="native-banner-container" class="w-full flex justify-center my-8 min-h-[90px]"></div>
+    <div id="native-banner-container" class="w-full flex justify-center my-8 min-h-[90px]">
+        <div id="container-9c0160470687def6fc582f0096557057"></div>
+    </div>
 
     <footer class="bg-gray-100 dark:bg-gray-950 py-12 mt-20 border-t dark:border-gray-800 pb-32">
         <!-- pb-32 para el banner de cookies -->
@@ -747,7 +749,7 @@
             try {
                 const getCountry = async (url) => {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout for mobile data
                     const response = await fetch(url, { signal: controller.signal });
                     clearTimeout(timeoutId);
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -825,7 +827,12 @@
                 } else {
                     changeLanguage(savedLang);
                 }
-                if (!consent) showConsentBanner();
+                if (!consent) {
+                    showConsentBanner();
+                } else if (consent === 'true') {
+                    loadAds();
+                    loadKofi();
+                }
             }
         }
 
@@ -877,25 +884,15 @@
         let adsLoaded = false;
         let kofiLoaded = false;
         async function loadAds() {
+            if (localStorage.getItem('pdfqt_consent') !== 'true') return;
             if (adsLoaded) return;
             adsLoaded = true;
-            if (localStorage.getItem('pdfqt_consent') !== 'true') return;
             console.log('Cargando Native Banner...');
             const script = document.createElement('script');
             script.async = true;
             script.dataset.cfasync = 'false';
             script.src = 'https://pl28904959.effectivegatecpm.com/9c0160470687def6fc582f0096557057/invoke.js';
-            // Native banner needs its container div in the DOM before the script runs
-            const container = document.getElementById('container-9c0160470687def6fc582f0096557057');
-            if (!container) {
-                // If container doesn't exist, create it inside native-banner-container
-                const wrapper = document.getElementById('native-banner-container');
-                if (wrapper) {
-                    const div = document.createElement('div');
-                    div.id = 'container-9c0160470687def6fc582f0096557057';
-                    wrapper.appendChild(div);
-                }
-            }
+            // The container is now directly in the HTML for reliability
             document.body.appendChild(script);
         }
 
